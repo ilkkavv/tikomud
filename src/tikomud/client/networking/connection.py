@@ -1,4 +1,5 @@
 import socket
+import threading
 
 class ClientConnection:
 
@@ -21,3 +22,31 @@ class ClientConnection:
                 self.socket.close()
         except OSError:
             pass
+
+    def start_receiver(self):
+        thread = threading.Thread(target=self._receiver_loop, daemon=True)
+        thread.start()
+
+    def _receiver_loop(self):
+        buffer = ""
+
+        while not self.stop_event.is_set():
+            try:
+                data = self.socket.recv(self.buff_size)
+                if not data:
+                    self.incoming_queue.put("Server closed the connection.")
+                    self.stop_event.set()
+                    break
+
+                buffer += data.decode("utf-8", errors="replace")
+
+                while "\n" in buffer:
+                    line, buffer = buffer.split("\n", 1)
+                    line = line.rstrip("\r")
+                    if line:
+                        self.incoming_queue.put(line)
+
+            except OSError:
+                self.incoming_queue.put("Connection lost.")
+                self.stop_event.set()
+                break
