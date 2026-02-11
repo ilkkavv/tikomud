@@ -50,3 +50,8 @@ class ClientConnection:
                 self.incoming_queue.put("Connection lost.")
                 self.stop_event.set()
                 break
+
+    def send(self, text):
+        if not self.socket:
+            return
+        self.socket.sendall((text + "\n").encode("utf-8"))
