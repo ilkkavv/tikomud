@@ -6,18 +6,26 @@ The project focuses on collaborative Git workflows, branch-based development, an
 
 ## Installation & Running
 
-Requirements:
+### Requirements
 - Python 3.10+
 - Linux / WSL (curses is required)
 
-Clone the repository:
+### Clone the repository
 ```bash
 git clone https://github.com/ilkkavv/tikomud
 cd tikomud
 ```
 
-Run the client (TUI):
+### Running the server
+Open a terminal:
 ```bash
-cd src
+cd tikomud/src
+python3 -m tikomud.server
+```
+
+### Running the client (TUI)
+Open another terminal:
+```bash
+cd tikomud/src
 python3 -m tikomud.client
 ```
