@@ -49,10 +49,6 @@ def _main(stdscr, send_fn, incoming_queue, stop_event) -> None:
         if key == -1:
             continue
 
-        # Implemented backspace support.
-        if key in (curses.KEY_BACKSPACE, 127, 8):
-            current_input = current_input[:-1]
-
         if key in (10, 13): # Enter
             msg = current_input.strip()
             current_input = ""
@@ -66,6 +62,7 @@ def _main(stdscr, send_fn, incoming_queue, stop_event) -> None:
         if 32 <= key <= 126:
             current_input += chr(key)
 
+        # Implement backspace support!
 
 def run(send_fn, incoming_queue, stop_event) -> None:
     curses.wrapper(lambda stdscr: _main(stdscr, send_fn, incoming_queue, stop_event))
