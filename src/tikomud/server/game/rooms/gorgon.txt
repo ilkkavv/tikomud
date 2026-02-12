@@ -1,3 +1,6 @@
+# NOTE: Feel free to split the text into smaller sections
+# if needed to support the game's functionality.
+
 It's pitch black.
 You hear nothing at first -
 only the heavy silence
