@@ -1,3 +1,3 @@
 class Player:
-    """Placeholder for Player entity"""
-    pass
+    def __init__(self, name):
+        self.name = name
