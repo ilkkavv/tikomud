@@ -1,6 +1,8 @@
 from tikomud.server.connections.clients import add_client, remove_client, broadcast
+from tikomud.server.game.game import Game
+from tikomud.server.game.player import Player
 
-def handle_client(conn, buff_size: int) -> None:
+def handle_client(game: Game, conn, buff_size: int) -> None:
     username = ""
 
     try:
@@ -13,7 +15,9 @@ def handle_client(conn, buff_size: int) -> None:
         if not username:
             return
 
-        add_client(conn, username)
+        new_player = Player(username)
+        add_client(conn, new_player)
+        game.add_player(new_player)
         print(f"{username} joined.")
 
         broadcast(f"{username} joined!")
@@ -28,15 +32,17 @@ def handle_client(conn, buff_size: int) -> None:
             if not raw:
                 continue
 
-            broadcast(raw, conn)
+            broadcast(raw, new_player)
     except ConnectionResetError:
         print(f"Connection reset by {username or 'unknown'}.")
     finally:
         leaving = remove_client(conn)
 
         if leaving:
-            print(f"{leaving} left.")
-            broadcast(f"{leaving} has left!")
+            if leaving in game.players:
+                game.remove_player(leaving)
+            print(f"{leaving.name} left.")
+            broadcast(f"{leaving.name} has left!")
 
         try:
             conn.close()
