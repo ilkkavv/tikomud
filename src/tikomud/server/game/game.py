@@ -1,4 +1,4 @@
-from player import Player
+from tikomud.server.game.player import Player
 import threading
 
 class Game:
