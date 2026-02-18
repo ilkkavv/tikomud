@@ -1,0 +1,8 @@
+{
+  "name": "Room Two",
+  "description": "A dimly lit room with a wooden floor.",
+  "items": [],
+  "exits": {
+    "east": "room1"
+  }
+}
