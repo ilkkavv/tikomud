@@ -2,11 +2,13 @@ from tikomud.server.game.player import Player
 import threading
 
 class Room:
-    def __init__(self, room_id, name = "", description = "", items=None, exits=None):
+    def __init__(self, room_id, name = "", description = "", items=None, exits=None, coordinates=None):
         if exits is None:
             exits = {}
         if items is None:
             items = []
+        if coordinates is None:
+            coordinates = {}
 
         self.id = room_id
         self.name = name
@@ -14,6 +16,7 @@ class Room:
         self.items = items
         self.exits = exits
         self.players = []
+        self.coordinates = coordinates
 
         self.players_lock = threading.Lock()
 
