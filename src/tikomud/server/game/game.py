@@ -4,7 +4,7 @@ import threading
 
 class Game:
     def __init__(self):
-        self.world = {"overworld": Map("./rooms/overworld")}
+        self.world = {"overworld": Map("rooms/overworld")}
         self.players = []
 
         self.game_lock = threading.Lock()
