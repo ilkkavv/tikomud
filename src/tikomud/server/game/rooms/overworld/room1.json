@@ -1,0 +1,8 @@
+{
+  "name": "Room One",
+  "description": "A small stone chamber with cold walls.",
+  "items": [],
+  "exits": {
+    "west": "room2"
+  }
+}
