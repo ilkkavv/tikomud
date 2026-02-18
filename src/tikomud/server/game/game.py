@@ -1,9 +1,10 @@
 from tikomud.server.game.player import Player
+from tikomud.server.game.map import Map
 import threading
 
 class Game:
-    def __init__(self, worlds: []):
-        self.world = worlds
+    def __init__(self):
+        self.world = {"overworld": Map("./rooms/overworld")}
         self.players = []
 
         self.game_lock = threading.Lock()
