@@ -7,7 +7,7 @@ import threading
 def run(host: str = "127.0.0.1", port: int = 7537, max_clients: int = 10, buff_size: int = 1024) -> None:
     print("Starting TIKOMUD server...")
 
-    game = Game([])
+    game = Game()
 
     tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
