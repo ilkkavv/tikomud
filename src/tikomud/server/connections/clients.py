@@ -1,5 +1,6 @@
 from datetime import datetime
 import threading
+import socket
 
 from tikomud.server.game.player import Player
 
@@ -31,3 +32,37 @@ def broadcast(text: str, sender = "Server") -> None:
             c.sendall((line + "\n").encode("utf-8"))
         except OSError:
             pass
+
+# Add kick command to server to remove unwanted players.
+def kick_by_name(name: str) -> bool:
+    name = name.strip().lower()
+    target_conn = None
+
+    # First: find and remove under lock
+    with clients_lock:
+        for conn, player in list(clients.items()):
+            if player.name.lower() == name:
+                target_conn = conn
+                clients.pop(conn, None)
+                break
+
+    if not target_conn:
+        return False
+
+    # Now operate on socket OUTSIDE the lock
+    try:
+        target_conn.sendall(b"You have been kicked by the server.\n")
+    except OSError:
+        pass
+
+    try:
+        target_conn.shutdown(socket.SHUT_RDWR)
+    except OSError:
+        pass
+
+    try:
+        target_conn.close()
+    except OSError:
+        pass
+
+    return True
