@@ -21,3 +21,12 @@ class Player:
             self.inventory[key] = (current_name, current_qty + qty)
         else:
             self.inventory[key] = (name, qty)
+
+    def list_inventory(self):
+        if not self.inventory:
+            return ["(empty)"]
+
+        lines = []
+        for key, (name, qty) in self.inventory.items():
+            lines.append(f"{name} x{qty}")
+        return lines
