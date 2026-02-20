@@ -6,6 +6,8 @@ class Player:
             "room": "room1"
         }
 
+        self.inventory = {}
+
     def set_position(self, map_name: str, room_id: str):
         self.position["map_name"] = map_name
         self.position["room"] = room_id
