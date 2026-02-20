@@ -6,6 +6,7 @@ class Player:
             "room": "room1"
         }
 
+        # NEW: Player inventory structure
         self.inventory = {}
 
     def set_position(self, map_name: str, room_id: str):
