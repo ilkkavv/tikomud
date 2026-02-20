@@ -1,4 +1,4 @@
-from tikomud.server.connections.clients import add_client, remove_client, broadcast
+from tikomud.server.connections.clients import add_client, remove_client, broadcast, kicked
 from tikomud.server.game.game import Game
 from tikomud.server.game.player import Player
 
@@ -41,8 +41,13 @@ def handle_client(game: Game, conn, buff_size: int) -> None:
         if leaving:
             if leaving in game.players:
                 game.remove_player(leaving)
-            print(f"{leaving.name} left.")
-            broadcast(f"{leaving.name} has left!")
+                if leaving.name in kicked:
+                    kicked.remove(leaving.name)
+                    print(f"{leaving.name} was kicked.")
+                    broadcast(f"{leaving.name} was kicked by the server!")
+                else:
+                    print(f"{leaving.name} left.")
+                    broadcast(f"{leaving.name} has left!")
 
         try:
             conn.close()
