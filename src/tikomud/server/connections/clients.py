@@ -6,6 +6,7 @@ from tikomud.server.game.player import Player
 
 clients = {}
 clients_lock = threading.Lock()
+kicked = set()
 
 def add_client(conn, player: Player) -> None:
     with clients_lock:
@@ -37,21 +38,21 @@ def broadcast(text: str, sender = "Server") -> None:
 def kick_by_name(name: str) -> bool:
     name = name.strip().lower()
     target_conn = None
+    target_player = None
 
-    # First: find and remove under lock
     with clients_lock:
-        for conn, player in list(clients.items()):
+        for conn, player in clients.items():
             if player.name.lower() == name:
                 target_conn = conn
-                clients.pop(conn, None)
+                target_player = player
+                kicked.add(player.name)
                 break
 
     if not target_conn:
         return False
 
-    # Now operate on socket OUTSIDE the lock
     try:
-        target_conn.sendall(b"You have been kicked by the server.\n")
+        target_conn.sendall(b"You have been kicked by admin.\n")
     except OSError:
         pass
 
