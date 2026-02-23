@@ -26,6 +26,12 @@ def _send_json(conn, obj: dict) -> None:
     line = json.dumps(obj, ensure_ascii=False, separators=(",", ":")) + "\n"
     conn.sendall(line.encode("utf-8"))
 
+def send_json_to(conn, obj: dict) -> None:
+    try:
+        _send_json(conn, obj)
+    except OSError:
+        pass
+
 def broadcast_json(obj: dict) -> None:
     with clients_lock:
         conns = list(clients.keys())
