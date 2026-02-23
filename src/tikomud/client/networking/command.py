@@ -30,11 +30,10 @@ def send_validated(connection, user_input: str) -> Optional[str]:
     packet, local_msg = validate(user_input)
 
     if local_msg is not None:
-        return local_msg  # UI näyttää tämän
+        return local_msg
 
     if packet is None:
         return None
 
-    line = json.dumps(packet, ensure_ascii=False, separators=(",", ":"))
-    connection.send(line)
+    connection.send_json(packet)
     return None
