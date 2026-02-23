@@ -1,6 +1,7 @@
 from datetime import datetime
 import threading
 import socket
+import json
 
 from tikomud.server.game.player import Player
 
@@ -21,20 +22,30 @@ def get_name(conn) -> str:
         player = clients.get(conn)
         return player.name if player else "Unknown"
 
-def broadcast(text: str, sender = "Server") -> None:
-    sender_name = sender.name if isinstance(sender, Player) else sender
-    line = f"{datetime.now().strftime('%H:%M:%S')} [{sender_name}]: {text}"
+def _send_json(conn, obj: dict) -> None:
+    line = json.dumps(obj, ensure_ascii=False, separators=(",", ":")) + "\n"
+    conn.sendall(line.encode("utf-8"))
 
+def broadcast_json(obj: dict) -> None:
     with clients_lock:
         conns = list(clients.keys())
 
     for c in conns:
         try:
-            c.sendall((line + "\n").encode("utf-8"))
+            _send_json(c, obj)
         except OSError:
             pass
 
-# Add kick command to server to remove unwanted players.
+def broadcast_chat(message: str, sender="Server") -> None:
+    sender_name = sender.name if isinstance(sender, Player) else str(sender)
+    payload = {
+        "type": "chat",
+        "time": datetime.now().strftime("%H:%M:%S"),
+        "sender": sender_name,
+        "message": message,
+    }
+    broadcast_json(payload)
+
 def kick_by_name(name: str) -> bool:
     name = name.strip().lower()
     target_conn = None
@@ -52,7 +63,7 @@ def kick_by_name(name: str) -> bool:
         return False
 
     try:
-        target_conn.sendall(b"You have been kicked by admin.\n")
+        _send_json(target_conn, {"type": "system", "message": "You have been kicked by admin."})
     except OSError:
         pass
 
