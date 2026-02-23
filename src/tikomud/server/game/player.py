@@ -33,6 +33,7 @@ class Player:
             lines.append(f"{name} x{qty}")
         return lines
 
+    # NEW: resolve item key
     def _resolve_key(self, key_or_name: str):
         query = key_or_name.strip().lower()
         if not query:
@@ -50,6 +51,7 @@ class Player:
 
         return None
 
+    # NEW: check if player has item
     def has_item(self, key_or_name, qty = 1):
         resolved_key = self._resolve_key(key_or_name)
         if not resolved_key:
@@ -58,6 +60,7 @@ class Player:
         _name, qty_have, _desc = self.inventory[resolved_key]
         return qty_have >= max(1, qty)
 
+    # NEW: remove item from inventory
     def remove_item(self, key_or_name, qty = 1):
         resolved_key = self._resolve_key(key_or_name)
         if not resolved_key or qty <= 0:
