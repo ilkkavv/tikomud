@@ -1,8 +1,8 @@
 import socket
 import threading
+import json
 
 class ClientConnection:
-
     def __init__(self, host, port, incoming_queue, stop_event, buff_size=1024):
         self.host = host
         self.port = port
@@ -34,7 +34,7 @@ class ClientConnection:
             try:
                 data = self.socket.recv(self.buff_size)
                 if not data:
-                    self.incoming_queue.put("Server closed the connection.")
+                    self.incoming_queue.put({"type": "system", "message": "Server closed the connection."})
                     self.stop_event.set()
                     break
 
@@ -42,16 +42,34 @@ class ClientConnection:
 
                 while "\n" in buffer:
                     line, buffer = buffer.split("\n", 1)
-                    line = line.rstrip("\r")
-                    if line:
-                        self.incoming_queue.put(line)
+                    line = line.rstrip("\r").strip()
+                    if not line:
+                        continue
+
+                    try:
+                        msg = json.loads(line)
+                        self.incoming_queue.put(msg)
+                    except json.JSONDecodeError:
+                        self.incoming_queue.put({"type": "text", "message": line})
 
             except OSError:
-                self.incoming_queue.put("Connection lost.")
+                self.incoming_queue.put({"type": "system", "message": "Connection lost."})
                 self.stop_event.set()
                 break
 
-    def send(self, text):
+    def send_json(self, packet: dict) -> None:
+        if not self.socket:
+            return
+
+        try:
+            line = json.dumps(packet, ensure_ascii=False, separators=(",", ":"))
+        except (TypeError, ValueError) as e:
+            self.incoming_queue.put({"type": "error", "code": "SERIALIZE_FAILED", "message": str(e)})
+            return
+
+        self.socket.sendall((line + "\n").encode("utf-8"))
+
+    def send_line(self, text: str) -> None:
         if not self.socket:
             return
         self.socket.sendall((text + "\n").encode("utf-8"))
