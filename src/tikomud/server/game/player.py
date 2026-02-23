@@ -15,6 +15,8 @@ class Player:
 
     def add_item(self, key: str, name: str, qty: int = 1, desc: str = ""):
         key = key.lower().strip()
+        if qty <= 0:
+            return
 
         if key in self.inventory:
             current_name, current_qty, current_desc = self.inventory[key]
