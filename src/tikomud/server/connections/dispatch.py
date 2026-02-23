@@ -20,3 +20,16 @@ def handle_command(game, conn, player, msg: dict) -> None:
 
         broadcast_chat(message, sender=player)
         return
+
+    if command == "inv":
+        lines = player.list_inventory()
+        text = "Inventory: " + ", ".join(lines)
+
+        send_json_to(
+            conn,
+            {
+                "type": "system",
+                "message": text,
+            },
+        )
+        return
