@@ -1,4 +1,5 @@
 from tikomud.server.connections.clients import broadcast_chat
+from tikomud.server.connections.clients import send_json_to
 
 def handle_command(game, conn, player, msg: dict) -> None:
     if not isinstance(msg, dict):
