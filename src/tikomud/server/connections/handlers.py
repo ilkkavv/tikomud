@@ -31,11 +31,14 @@ def handle_client(game: Game, conn, buff_size: int) -> None:
             raw = data.decode("utf-8", errors="replace").strip()
             if not raw:
                 continue
+
+            """
             if raw.lower() in ("inv", "inventory"):
                 lines = new_player.list_inventory()
                 text = "\n".join(lines) + "\n"
                 conn.sendall(text.encode("utf-8"))
                 continue
+            """
 
             broadcast(raw, new_player)
     except ConnectionResetError:
