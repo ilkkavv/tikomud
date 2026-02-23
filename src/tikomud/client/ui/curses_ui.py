@@ -1,5 +1,36 @@
 import curses
 import queue
+from typing import Any
+
+def render_incoming(msg: Any) -> str:
+    if isinstance(msg, str):
+        return msg
+
+    if isinstance(msg, dict):
+        mtype = msg.get("type")
+
+        if mtype == "chat":
+            t = msg.get("time", "")
+            sender = msg.get("sender", "Unknown")
+            text = msg.get("message", "")
+            if t:
+                return f"{t} [{sender}]: {text}"
+            return f"[{sender}]: {text}"
+
+        if mtype == "system":
+            return msg.get("message", "")
+
+        if mtype == "error":
+            code = msg.get("code", "ERROR")
+            text = msg.get("message", "")
+            return f"{code}: {text}" if text else str(code)
+
+        if mtype == "text":
+            return msg.get("message", "")
+
+        return str(msg)
+
+    return str(msg)
 
 def print_msg(messages, msg: str) -> None:
     messages.append(msg)
@@ -32,8 +63,10 @@ def _main(stdscr, send_fn, incoming_queue, stop_event) -> None:
     while True:
         try:
             while True:
-                line = incoming_queue.get_nowait()
-                print_msg(messages, line)
+                incoming = incoming_queue.get_nowait()
+                line = render_incoming(incoming)
+                if line:
+                    print_msg(messages, line)
         except queue.Empty:
             pass
 
@@ -49,23 +82,25 @@ def _main(stdscr, send_fn, incoming_queue, stop_event) -> None:
         if key == -1:
             continue
 
-        # Implemented backspace support.
+        # Backspace support
         if key in (curses.KEY_BACKSPACE, 127, 8):
             current_input = current_input[:-1]
+            continue
 
-        if key in (10, 13): # Enter
+        if key in (10, 13):  # Enter
             msg = current_input.strip()
             current_input = ""
 
             if not msg:
                 continue
 
-            send_fn(msg)
+            local_msg = send_fn(msg)
+            if local_msg:
+                print_msg(messages, str(local_msg))
             continue
 
         if 32 <= key <= 126:
             current_input += chr(key)
-
 
 def run(send_fn, incoming_queue, stop_event) -> None:
     curses.wrapper(lambda stdscr: _main(stdscr, send_fn, incoming_queue, stop_event))
