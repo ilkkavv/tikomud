@@ -47,3 +47,10 @@ class Player:
             return matches[0]
 
         return None
+
+    def has_item(self, key_or_name, qty = 1):
+        resolved_key = self._resolve_key(key_or_name)
+        if not resolved_key:
+            return False
+        _name, qty_have, _desc = self.inventory[resolved_key]
+        return qty_have >= max(1, qty)
