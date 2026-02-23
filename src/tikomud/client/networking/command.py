@@ -24,6 +24,16 @@ def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
             "payload": {"message": message},
         }, None
 
+    if cmd in ("inv", "inventory"):
+        if len(parts) == 1:
+            return {
+                "type": "command",
+                "command": "inv",
+                "payload": {},
+            }, None
+
+        return None, "Usage: inv or inventory"
+
     return None, f"Unknown command: {cmd}"
 
 def send_validated(connection, user_input: str) -> Optional[str]:
