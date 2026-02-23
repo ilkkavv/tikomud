@@ -13,20 +13,37 @@ class Player:
         self.position["map_name"] = map_name
         self.position["room"] = room_id
 
-    def add_item(self, key: str, name: str, qty: int = 1):
+    def add_item(self, key: str, name: str, qty: int = 1, desc: str = ""):
         key = key.lower().strip()
 
         if key in self.inventory:
-            current_name, current_qty = self.inventory[key]
-            self.inventory[key] = (current_name, current_qty + qty)
+            current_name, current_qty, current_desc = self.inventory[key]
+            self.inventory[key] = (current_name, current_qty + qty, current_desc or desc)
         else:
-            self.inventory[key] = (name, qty)
+            self.inventory[key] = (name, qty, desc)
 
     def list_inventory(self):
         if not self.inventory:
             return ["(empty)"]
 
         lines = []
-        for key, (name, qty) in self.inventory.items():
+        for key, (name, qty, desc) in self.inventory.items():
             lines.append(f"{name} x{qty}")
         return lines
+
+    def _resolve_key(self, key_or_name: str):
+        query = key_or_name.strip().lower()
+        if not query:
+            return None
+
+        if query in self.inventory:
+            return query
+
+        matches = [
+            key for key, (display_name, _qty, _desc) in self.inventory.items()
+            if display_name.lower() == query
+        ]
+        if len(matches) == 1:
+            return matches[0]
+
+        return None
