@@ -92,3 +92,10 @@ class Game:
             d[k] = (name0, qty0 + qty, desc0 or description)
         else:
             d[k] = (display_name, qty, description)
+
+    def list_room_items(self, map_name: str, room_id: str):
+        self._ensure_room(map_name, room_id)
+        d = self.room_items[(map_name, room_id)]
+        if not d:
+            return ["(nothing)"]
+        return [f"{name} x{qty}" for _k, (name, qty, _desc) in sorted(d.items())]
