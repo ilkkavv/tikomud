@@ -86,37 +86,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         })
         return
 
-    if command == "examine":
-        item_name = str(payload.get("item", "")).strip()
-
-        if not item_name:
-            send_json_to(conn, {
-                "type": "system",
-                "message": "Usage: examine <item>"
-            })
-            return
-
-        key = player._resolve_key(item_name)
-        if not  key:
-            send_json_to(conn, {
-                "type": "system",
-                "message": f"'{item_name}' not found in your inventory."
-            })
-            return
-
-        name, qty, desc = player.inventory[key]
-        send_json_to(conn, {
-            "type": "examine",
-            "item": {
-                "key": key,
-                "name": name,
-                "quantity": qty,
-                "description": desc
-            }
-        })
-        return
-
-    # NEW: 'examine' command for item
+    # NEW: examine command for item
     if command == "examine":
         item_name = str(payload.get("item", "")).strip()
 
