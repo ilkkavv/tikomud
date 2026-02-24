@@ -4,6 +4,36 @@ TIKOMUD is a MUD-style multiplayer text adventure and role-playing game develope
 
 The project focuses on collaborative Git workflows, branch-based development, and structured releases while building a shared text-based game world.
 
+⚠️ **Work in Progress**
+
+This project is currently under active development. The game is not feature-complete and core systems are still being implemented.
+
+---
+
+## Current Features (Release 0.1.0)
+
+- Basic client-server architecture
+- Player name input on launch
+- `yell` command (broadcast message to all connected players)
+- `inv` command (displays player inventory - currently empty)
+
+---
+
+## Planned Core Features (Not Yet Implemented)
+
+The following major systems are still missing:
+
+- Authentication / proper login system
+- Persistent world (data saving)
+- Player movement between rooms
+- Character stats and progression
+- Items and equipment system
+- NPCs
+- Monsters and combat system
+- Dialogue system
+
+---
+
 ## Installation & Running
 
 ### Requirements
