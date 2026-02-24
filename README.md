@@ -59,3 +59,14 @@ Open another terminal:
 cd tikomud/src
 python3 -m tikomud.client
 ```
+
+### How to Play
+
+- Start the server.
+- Launch the client.
+- Enter your player name when prompted.
+- Available commands:
+  - `yell` - send a message to all connected players
+  - `inv` - show your inventory (currently empty)
+
+More gameplay systems will be introduced in future releases.
