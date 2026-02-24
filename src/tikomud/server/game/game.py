@@ -57,3 +57,19 @@ class Game:
         key = (map_name, room_id)
         if key not in self.room_items:
             self.room_items[key] = {}
+
+    def _resolve_key_in(self, d: dict, key_or_name: str):
+        q = (key_or_name or "").strip().lower()
+        if not q:
+            return None
+        if q in d:
+            return q
+
+        matched_key = None
+        for key, (display_name, _qty, _desc) in d.items():
+            if (display_name or "").strip().lower() == q:
+                if matched_key is None:
+                    matched_key = key
+                else:
+                    return None
+        return matched_key
