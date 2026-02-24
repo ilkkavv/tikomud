@@ -73,3 +73,22 @@ class Game:
                 else:
                     return None
         return matched_key
+
+    def add_room_item(self, map_name: str, room_id: str, key: str,
+                      display_name: str, qty: int = 1,
+                      description: str = "") -> None:
+        if qty <= 0:
+            return
+
+        self._ensure_room(map_name, room_id)
+        d = self.room_items[(map_name, room_id)]
+
+        k = (key or "").strip().lower()
+        if not k:
+            return
+
+        if k in d:
+            name0, qty0, desc0 = d[k]
+            d[k] = (name0, qty0 + qty, desc0 or description)
+        else:
+            d[k] = (display_name, qty, description)
