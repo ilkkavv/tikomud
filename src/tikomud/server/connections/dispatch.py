@@ -86,7 +86,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         })
         return
 
-    # NEW: examine command for item
+    # NEW: 'examine' command for item
     if command == "examine":
         item_name = str(payload.get("item", "")).strip()
 
