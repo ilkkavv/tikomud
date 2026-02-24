@@ -7,6 +7,8 @@ class Game:
         self.world = {"overworld": Map("rooms/overworld")}
         self.players = []
 
+        self.room_items = {}
+
         self.game_lock = threading.Lock()
 
     def add_player(self, new_player: Player) -> None:
