@@ -52,3 +52,8 @@ class Game:
         player.set_position(target_map_name, target_room_id)
 
         return True, f"You move {direction}.\n{target_room.description}"
+
+    def _ensure_room(self, map_name: str, room_id: str) -> None:
+        key = (map_name, room_id)
+        if key not in self.room_items:
+            self.room_items[key] = {}
