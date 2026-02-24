@@ -106,8 +106,13 @@ def handle_command(game, conn, player, msg: dict) -> None:
 
         name, qty, desc = player.inventory[key]
         send_json_to(conn, {
-            "type": "system",
-            "message": f"{name}: {desc or '(no description)'}"
+            "type": "examine",
+            "item": {
+                "key": key,
+                "name": name,
+                "quantity": qty,
+                "description": desc
+            }
         })
         return
 
