@@ -1,5 +1,7 @@
 import curses
 import queue
+import textwrap
+
 from typing import Any
 
 def render_incoming(msg: Any) -> str:
@@ -32,8 +34,16 @@ def render_incoming(msg: Any) -> str:
 
     return str(msg)
 
-def print_msg(messages, msg: str) -> None:
-    messages.append(msg)
+def print_msg(messages, msg) -> None:
+    if not isinstance(msg, str):
+        msg = str(msg)
+
+    for raw_line in msg.splitlines() or [""]:
+        wrapped = textwrap.wrap(raw_line, width=120)  # tai anna width draw()sta
+        if not wrapped:
+            messages.append("")
+        else:
+            messages.extend(wrapped)
 
 def draw(stdscr, messages, current_input: str) -> None:
     stdscr.clear()
