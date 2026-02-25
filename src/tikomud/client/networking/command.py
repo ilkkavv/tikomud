@@ -34,6 +34,32 @@ def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
 
         return None, "Usage: inv or inventory"
 
+    if cmd in ("m", "move"):
+        payload = ""
+        if len(parts) == 2:
+            if parts[1] in ("n", "north"):
+                payload = "north"
+            elif parts[1] in ("e", "east"):
+                payload = "east"
+            elif parts[1] in ("s", "south"):
+                payload = "south"
+            elif parts[1] in ("w", "west"):
+                payload = "west"
+            elif parts[1] in ("u", "up"):
+                payload = "up"
+            elif parts[1] in ("d", "down"):
+                payload = "down"
+            else:
+                return None, "Usage: move [direction]"
+
+            return {
+                "type": "command",
+                "command": "move",
+                "payload": {"dir": payload},
+            }, None
+
+        return None, "Usage: move [direction]"
+
     return None, f"Unknown command: {cmd}"
 
 def send_validated(connection, user_input: str) -> Optional[str]:
