@@ -34,3 +34,17 @@ def handle_command(game, conn, player, msg: dict) -> None:
             },
         )
         return
+
+    if command == "move":
+        direction = str(payload.get("dir", "")).lower()
+
+        success, message = game.move_player(player, direction)
+
+        send_json_to(
+            conn,
+            {
+                "type": "system",
+                "message": message,
+            },
+        )
+        return
