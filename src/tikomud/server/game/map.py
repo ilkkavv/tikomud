@@ -28,3 +28,9 @@ class Map:
                 coordinates=data.get("coordinates", {})
             )
             self.rooms.append(room)
+
+    def get_room(self, room_id: str) -> Room | None:
+        for room in self.rooms:
+            if room.id == room_id:
+                return room
+        return None
