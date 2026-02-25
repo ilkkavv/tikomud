@@ -1,4 +1,4 @@
-from tikomud.server.connections.clients import broadcast_chat
+from tikomud.server.connections.clients import broadcast_chat, broadcast_chat_in_room
 from tikomud.server.connections.clients import send_json_to
 
 def handle_command(game, conn, player, msg: dict) -> None:
@@ -20,6 +20,18 @@ def handle_command(game, conn, player, msg: dict) -> None:
             return
 
         broadcast_chat(message, sender=player)
+        return
+
+    # Command for chatting inside current room
+    if command == "say":
+        message = ""
+        if isinstance(payload, dict):
+            message = str(payload.get("message", "")).strip()
+
+        if not message:
+            return
+
+        broadcast_chat_in_room(message, sender=player)
         return
 
     if command == "inv":
