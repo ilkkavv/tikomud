@@ -48,7 +48,7 @@ def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
 
         return None, "Usage: inv or inventory"
 
-    if cmd in ("m", "move"):
+    if cmd in ("m", "move", "go"):
         payload = ""
         if len(parts) == 2:
             if parts[1] in ("n", "north"):
