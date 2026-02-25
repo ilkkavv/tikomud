@@ -3,6 +3,6 @@
   "description": "A dimly lit room with a wooden floor.",
   "items": [],
   "exits": {
-    "east": "room1"
+    "east": {"map": "overworld", "room": "room1"}
   }
 }
