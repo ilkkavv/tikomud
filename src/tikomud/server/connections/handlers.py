@@ -20,6 +20,10 @@ def handle_client(game: Game, conn, buff_size: int) -> None:
         new_player = Player(username)
         add_client(conn, new_player)
         game.add_player(new_player)
+        start_map = game.world["overworld"]
+        start_room = start_map.get_room("room1")
+        start_room.add_player(new_player)
+        new_player.set_position(start_map, start_room)
         print(f"{username} joined.")
 
         broadcast_json(
