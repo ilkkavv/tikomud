@@ -1,10 +1,7 @@
 class Player:
     def __init__(self, name):
         self.name = name
-        self.position = {
-            "map_name": "overworld",
-            "room": "room1"
-        }
+        self.position = {}
 
         # Player inventory structure
         self.inventory = {}
