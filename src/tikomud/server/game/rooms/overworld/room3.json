@@ -1,0 +1,11 @@
+{
+    "name": "Room Three",
+    "description": "This dark room seems empty, but it makes me uneasy.",
+    "items": [],
+    "exits": {
+        "south": {
+            "map": "overworld",
+            "room": "room1"
+        }
+    }
+}
