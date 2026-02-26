@@ -15,6 +15,7 @@ This project is currently under active development. The game is not feature-comp
 - Basic client-server architecture
 - Player name input on launch
 - `yell` command (broadcast message to all connected players)
+- `say` command (broadcast message to players in same room)
 - `inv` command (displays player inventory - currently empty)
 
 ---
