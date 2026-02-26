@@ -3,6 +3,13 @@
   "description": "A small stone chamber with cold walls.",
   "items": [],
   "exits": {
-    "west": {"map": "overworld", "room": "room2"}
+    "west": {
+      "map": "overworld",
+      "room": "room2"
+    },
+    "north": {
+      "map": "overworld",
+      "room": "room3"
+    }
   }
 }
