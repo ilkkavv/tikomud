@@ -52,6 +52,27 @@ def broadcast_chat(message: str, sender="Server") -> None:
     }
     broadcast_json(payload)
 
+def broadcast_chat_in_room(message: str, sender: Player) -> None:
+    sender_room = sender.position.get("room")
+    sender_name = sender.name
+
+    payload = {
+        "type": "chat",
+        "time": datetime.now().strftime("%H:%M:%S"),
+        "sender": sender_name,
+        "message": message,
+    }
+
+    with clients_lock:
+        items = list(clients.items())
+
+    for conn, player in items:
+        if player.position.get("room") == sender_room:
+            try:
+                _send_json(conn, payload)
+            except OSError:
+                pass
+
 def kick_by_name(name: str) -> bool:
     name = name.strip().lower()
     target_conn = None
