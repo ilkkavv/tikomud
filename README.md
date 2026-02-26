@@ -26,7 +26,6 @@ The following major systems are still missing:
 
 - Authentication / proper login system
 - Persistent world (data saving)
-- Player movement between rooms
 - Character stats and progression
 - Items and equipment system
 - NPCs
