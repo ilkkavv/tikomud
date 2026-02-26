@@ -1,7 +1,9 @@
 from tikomud.server.connections.clients import broadcast_chat, broadcast_chat_in_room
 from tikomud.server.connections.clients import send_json_to
 
+
 def _parse_name_qty_from_payload(payload: dict) -> tuple[int, str]:
+    # Extract item name and quantity safely from command payload
     item_name = str(payload.get("item", "")).strip()
     qty = payload.get("qty", 1)
 
@@ -10,10 +12,14 @@ def _parse_name_qty_from_payload(payload: dict) -> tuple[int, str]:
     except (TypeError, ValueError):
         qty = 1
 
+    # Ensure quantity is always at least 1
     qty = max(1, qty)
     return qty, item_name
 
+
 def handle_command(game, conn, player, msg: dict) -> None:
+    # Main dispatcher for handling player commands
+
     if not isinstance(msg, dict):
         return
 
@@ -24,6 +30,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
     payload = msg.get("payload", {})
 
     if command == "yell":
+        # Global chat visible to all players
         message = ""
         if isinstance(payload, dict):
             message = str(payload.get("message", "")).strip()
@@ -34,7 +41,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         broadcast_chat(message, sender=player)
         return
 
-    # Command for chatting inside current room
+    # Chat only inside current room
     if command == "say":
         message = ""
         if isinstance(payload, dict):
@@ -47,6 +54,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         return
 
     if command == "inv":
+        # Return player's inventory contents
         lines = player.list_inventory()
         text = "Inventory: " + ", ".join(lines)
 
@@ -60,8 +68,8 @@ def handle_command(game, conn, player, msg: dict) -> None:
         return
 
     if command == "move":
+        # Move player in specified direction
         direction = str(payload.get("dir", "")).lower()
-
         success, message = game.move_player(player, direction)
 
         send_json_to(
@@ -73,7 +81,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         )
         return
 
-    # NEW: 'take' command for item
+    # Take item from current room (not fully implemented)
     if command == "take":
         qty, item_name = _parse_name_qty_from_payload(payload)
 
@@ -98,7 +106,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         })
         return
 
-    # NEW: 'examine' command for item
+    # Examine item from inventory
     if command == "examine":
         item_name = str(payload.get("item", "")).strip()
 
@@ -110,7 +118,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
             return
 
         key = player._resolve_key(item_name)
-        if not  key:
+        if not key:
             send_json_to(conn, {
                 "type": "system",
                 "message": f"'{item_name}' not found in your inventory."
@@ -118,6 +126,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
             return
 
         name, qty, desc = player.inventory[key]
+
         send_json_to(conn, {
             "type": "examine",
             "item": {
@@ -130,6 +139,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         return
 
     if command == "drop":
+        # Drop item from inventory into current room
         qty, item_name = _parse_name_qty_from_payload(payload)
 
         if not item_name:
@@ -167,9 +177,20 @@ def handle_command(game, conn, player, msg: dict) -> None:
 
         map_name = player.position["map_name"]
         room_id = player.position["room"]
-        game.add_room_item(map_name, room_id, resolved_key, display_name, qty, description)
 
-        broadcast_chat(f"{player.name} drops {display_name} x{qty}", sender=player)
+        game.add_room_item(
+            map_name,
+            room_id,
+            resolved_key,
+            display_name,
+            qty,
+            description
+        )
+
+        broadcast_chat(
+            f"{player.name} drops {display_name} x{qty}",
+            sender=player
+        )
 
         send_json_to(conn, {
             "type": "drop",
@@ -182,6 +203,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         })
 
     if command == "look":
+        # Show current room information and floor items
         map_name = player.position["map_name"]
         room_id = player.position["room"]
 
@@ -199,6 +221,7 @@ def handle_command(game, conn, player, msg: dict) -> None:
         return
 
     if command == "help":
+        # Return list of available commands
         send_json_to(conn, {
             "type": "help",
             "commands": [
