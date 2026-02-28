@@ -128,26 +128,26 @@ class Game:
         ]
 
     def load_npcs(self):
-    npc_folder = os.path.join(os.path.dirname(__file__), "npcs")
+        npc_folder = os.path.join(os.path.dirname(__file__), "npcs")
 
-    if not os.path.isdir(npc_folder):
-        return
+        if not os.path.isdir(npc_folder):
+            return
 
-    for filename in os.listdir(npc_folder):
-        if not filename.endswith(".json"):
-            continue
+        for filename in os.listdir(npc_folder):
+            if not filename.endswith(".json"):
+                continue
 
-        with open(os.path.join(npc_folder, filename)) as f:
-            data = json.load(f)
+            with open(os.path.join(npc_folder, filename)) as f:
+                data = json.load(f)
 
-        npc = NPC(
-            data["id"],
-            data["name"],
-            data.get("description", ""),
-            data.get("dialogue", [])
-        )
+            npc = NPC(
+                data["id"],
+                data["name"],
+                data.get("description", ""),
+                data.get("dialogue", [])
+            )
 
-        spawn = data["spawn"]
-        npc.set_position(spawn["map_name"], spawn["room"])
+            spawn = data["spawn"]
+            npc.set_position(spawn["map_name"], spawn["room"])
 
-        self.npcs.append(npc)
+            self.npcs.append(npc)
