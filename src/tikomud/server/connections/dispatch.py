@@ -213,12 +213,12 @@ def handle_command(game, conn, player, msg: dict) -> None:
 
         npc = game.find_npc_in_room(map_name, room_id, target)
 
-            if not npc:
-                send_json_to(conn, {
-                    "type": "system",
-                    "message": f"There is no '{target}' here."
-                })
-                return
+        if not npc:
+            send_json_to(conn, {
+                "type": "system",
+                "message": f"There is no '{target}' here."
+            })
+            return
 
         response = npc.talk()
 
@@ -227,7 +227,6 @@ def handle_command(game, conn, player, msg: dict) -> None:
             "npc": npc.name,
             "message": response
         })
-
         return
 
     if command == "help":
