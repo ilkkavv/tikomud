@@ -117,3 +117,11 @@ class Game:
             return npc
 
     return None
+
+    # Function to list npcs inside current room
+    def list_npcs_in_room(self, map_name: str, room_id: str):
+    return [
+        npc for npc in self.npcs
+        if npc.position["map_name"] == map_name
+        and npc.position["room"] == room_id
+    ]
