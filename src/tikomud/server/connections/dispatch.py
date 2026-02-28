@@ -185,16 +185,15 @@ def handle_command(game, conn, player, msg: dict) -> None:
         map_name = player.position["map_name"]
         room_id = player.position["room"]
 
-        if hasattr(game, "list_room_items"):
-            items = game.list_room_items(map_name, room_id)
-        else:
-            items = ["(nothing)"]
+        items = game.list_room_items(map_name, room_id)
+        npcs = game.list_npcs_in_room(map_name, room_id)
 
         send_json_to(conn, {
             "type": "look",
             "message": f"You are in {map_name}/{room_id}",
             "room": {"map": map_name, "id": room_id},
             "floor": items,
+            "npcs": [npc.name for npc in npcs]
         })
         return
 
