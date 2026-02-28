@@ -30,6 +30,11 @@ def render_incoming(msg: Any) -> str:
         if mtype == "text":
             return msg.get("message", "")
 
+        if mtype == "npc_talk":
+            npc_name = msg.get("npc", "Unknown")
+            text = msg.get("message", "")
+            return f"{npc_name} says: {text}"
+
         return str(msg)
 
     return str(msg)
