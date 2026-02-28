@@ -107,17 +107,17 @@ class Game:
 
     # Helper function to find npcs
     def find_npc_in_room(self, map_name: str, room_id: str, name: str):
-    name = name.strip().lower()
+        name = name.strip().lower()
 
-    for npc in self.npcs:
-        if (
-            npc.position["map_name"] == map_name and
-            npc.position["room"] == room_id and
-            npc.name.lower() == name
-        ):
-            return npc
+        for npc in self.npcs:
+            if (
+                npc.position["map_name"] == map_name and
+                npc.position["room"] == room_id and
+                npc.name.lower() == name
+            ):
+                return npc
 
-    return None
+        return None
 
     # Function to list npcs inside current room
     def list_npcs_in_room(self, map_name: str, room_id: str):
