@@ -1,6 +1,6 @@
 from tikomud.server.game.player import Player
 from tikomud.server.game.map import Map
-from tikomud.server.game.npc.npc import NPC
+from tikomud.server.game.npc import NPC
 import json
 import os
 import threading
