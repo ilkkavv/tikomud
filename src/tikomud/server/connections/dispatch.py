@@ -198,6 +198,39 @@ def handle_command(game, conn, player, msg: dict) -> None:
         })
         return
 
+    # Command talk
+    if command == "talk":
+    target = str(payload.get("target", "")).strip()
+
+    if not target:
+        send_json_to(conn, {
+            "type": "system",
+            "message": "Usage: talk <npc>"
+        })
+        return
+
+    map_name = player.position["map_name"]
+    room_id = player.position["room"]
+
+    npc = game.find_npc_in_room(map_name, room_id, target)
+
+        if not npc:
+        send_json_to(conn, {
+            "type": "system",
+            "message": f"There is no '{target}' here."
+        })
+        return
+
+    response = npc.talk()
+
+    send_json_to(conn, {
+        "type": "npc_talk",
+        "npc": npc.name,
+        "message": response
+    })
+
+    return
+
     if command == "help":
         send_json_to(conn, {
             "type": "help",
