@@ -6,6 +6,7 @@ class Game:
     def __init__(self):
         self.world = {"overworld": Map("rooms/overworld")}
         self.players = []
+        self.npcs = []
 
         self.room_items = {}
 
