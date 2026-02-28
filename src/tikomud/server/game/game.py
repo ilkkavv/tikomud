@@ -1,5 +1,8 @@
 from tikomud.server.game.player import Player
 from tikomud.server.game.map import Map
+from tikomud.server.game.npc import NPC
+import json
+import os
 import threading
 
 class Game:
@@ -100,3 +103,17 @@ class Game:
         if not d:
             return ["(nothing)"]
         return [f"{name} x{qty}" for _k, (name, qty, _desc) in sorted(d.items())]
+
+    # Helper function to find npcs
+    def find_npc_in_room(self, map_name: str, room_id: str, name: str):
+    name = name.strip().lower()
+
+    for npc in self.npcs:
+        if (
+            npc.position["map_name"] == map_name and
+            npc.position["room"] == room_id and
+            npc.name.lower() == name
+        ):
+            return npc
+
+    return None
