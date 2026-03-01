@@ -10,7 +10,7 @@ This project is currently under active development. The game is not feature-comp
 
 ---
 
-## Current Features (Release 0.1.0)
+## Current Features (Release 0.2.0)
 
 - Basic client-server architecture
 - Player name input on launch
