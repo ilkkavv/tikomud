@@ -5,15 +5,16 @@ class Room:
     def __init__(self, room_id, name = "", description = "", items=None, exits=None, coordinates=None):
         if exits is None:
             exits = {}
-        if items is None:
-            items = []
         if coordinates is None:
             coordinates = {}
 
         self.id = room_id
         self.name = name
         self.description = description
-        self.items = items
+
+        # Refactor: use dict for runtime item storage
+        self.items = {}
+
         self.exits = exits
         self.players = []
         self.coordinates = coordinates
