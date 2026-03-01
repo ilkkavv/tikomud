@@ -2,7 +2,7 @@ from tikomud.server.game.player import Player
 import threading
 
 class Room:
-    def __init__(self, room_id, name = "", description = "", items=None, exits=None, coordinates=None):
+    def __init__(self, room_id, name = "", description = "", exits=None, coordinates=None):
         if exits is None:
             exits = {}
         if coordinates is None:
