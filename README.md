@@ -65,10 +65,10 @@ python3 -m tikomud.client
 - Launch the client.
 - Enter your player name when prompted.
 - Available commands:
-  - `yell` command (broadcast message to all connected players)
-  - `say` command (broadcast message to players in same room)
-  - `inv` command (displays player inventory - currently empty)
-  - `move`, `m`, `go` <direction> command (moves player to given direction)
-  - `talk` command (talk to NPCs)
+  - `yell` – broadcast message to all connected players
+  - `say` – broadcast message to players in the same room
+  - `inv` – display player inventory (currently empty)
+  - `move | m | go <direction>` – move to the given direction
+  - `talk <npc>` – talk to an NPC
 
 More gameplay systems will be introduced in future releases.
