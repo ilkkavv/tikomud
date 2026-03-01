@@ -15,11 +15,6 @@ This project is currently under active development. The game is not feature-comp
 - Basic client-server architecture
 - Player name input on launch
 - Feature NPCs
-- `yell` command (broadcast message to all connected players)
-- `say` command (broadcast message to players in same room)
-- `inv` command (displays player inventory - currently empty)
-- `move`, `m`, `go` <direction> command (moves player to given direction)
-- `talk` command (talk to NPCs)
 
 ---
 
@@ -69,7 +64,10 @@ python3 -m tikomud.client
 - Launch the client.
 - Enter your player name when prompted.
 - Available commands:
-  - `yell` - send a message to all connected players
-  - `inv` - show your inventory (currently empty)
+  - `yell` command (broadcast message to all connected players)
+  - `say` command (broadcast message to players in same room)
+  - `inv` command (displays player inventory - currently empty)
+  - `move`, `m`, `go` <direction> command (moves player to given direction)
+  - `talk` command (talk to NPCs)
 
 More gameplay systems will be introduced in future releases.
