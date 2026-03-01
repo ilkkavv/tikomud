@@ -11,8 +11,6 @@ class Game:
         self.players = []
         self.npcs = []
 
-        self.room_items = {}
-
         self.game_lock = threading.Lock()
         self.load_npcs()
 
@@ -57,53 +55,6 @@ class Game:
         player.set_position(target_map_name, target_room_id)
 
         return True, f"You move {direction}.\n{target_room.description}"
-
-    def _ensure_room(self, map_name: str, room_id: str) -> None:
-        key = (map_name, room_id)
-        if key not in self.room_items:
-            self.room_items[key] = {}
-
-    def _resolve_key_in(self, d: dict, key_or_name: str):
-        q = (key_or_name or "").strip().lower()
-        if not q:
-            return None
-        if q in d:
-            return q
-
-        matched_key = None
-        for key, (display_name, _qty, _desc) in d.items():
-            if (display_name or "").strip().lower() == q:
-                if matched_key is None:
-                    matched_key = key
-                else:
-                    return None
-        return matched_key
-
-    def add_room_item(self, map_name: str, room_id: str, key: str,
-                      display_name: str, qty: int = 1,
-                      description: str = "") -> None:
-        if qty <= 0:
-            return
-
-        self._ensure_room(map_name, room_id)
-        d = self.room_items[(map_name, room_id)]
-
-        k = (key or "").strip().lower()
-        if not k:
-            return
-
-        if k in d:
-            name0, qty0, desc0 = d[k]
-            d[k] = (name0, qty0 + qty, desc0 or description)
-        else:
-            d[k] = (display_name, qty, description)
-
-    def list_room_items(self, map_name: str, room_id: str):
-        self._ensure_room(map_name, room_id)
-        d = self.room_items[(map_name, room_id)]
-        if not d:
-            return ["(nothing)"]
-        return [f"{name} x{qty}" for _k, (name, qty, _desc) in sorted(d.items())]
 
     # Helper function to find npcs
     def find_npc_in_room(self, map_name: str, room_id: str, name: str):
@@ -151,3 +102,38 @@ class Game:
             npc.set_position(spawn["map_name"], spawn["room"])
 
             self.npcs.append(npc)
+
+    # Room item management helpers
+    # Delegate item operations to the Room object itself
+    def add_item_to_room(self, map_name: str,
+                         room_id: str, key: str,
+                         display_name: str, qty: int = 1,
+                         description: str = "") -> None:
+        map_obj = self.world.get(map_name)
+        if not map_obj:
+            return
+
+        room = map_obj.get_room(room_id)
+        if room:
+            room.add_item(key, display_name, qty, description)
+
+    def remove_items_in_room(self, map_name: str, room_id: str,
+                             key_or_name: str, qty: int = 1) -> bool:
+        map_obj = self.world.get(map_name)
+        if not map_obj:
+            return
+
+        room = map_obj.get_room(room_id)
+        if room:
+            return room.remove_item(key_or_name, qty)
+        return False
+
+    def list_items_in_room(self, map_name: str, room_id: str):
+        map_obj = self.world.get(map_name)
+        if not map_obj:
+            return ["(nothing)"]
+
+        room = map_obj.get_room(room_id)
+        if room:
+            return room.list_items()
+        return ["(nothing)"]

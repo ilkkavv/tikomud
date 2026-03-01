@@ -23,7 +23,6 @@ class Map:
                 room_id=room_id,
                 name=data["name"],
                 description=data.get("description", ""),
-                items=data.get("items", []),
                 exits=data.get("exits", {}),
                 coordinates=data.get("coordinates", {})
             )
