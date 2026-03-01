@@ -102,3 +102,38 @@ class Game:
             npc.set_position(spawn["map_name"], spawn["room"])
 
             self.npcs.append(npc)
+
+    # Room item management helpers
+    # Delegate item operations to the Room object itself
+    def add_item_to_room(self, map_name: str,
+                         room_id: str, key: str,
+                         display_name: str, qty: int = 1,
+                         description: str = "") -> None:
+        map_obj = self.world.get(map_name)
+        if not map_obj:
+            return
+
+        room = map_obj.get_room(room_id)
+        if room:
+            room.add_item(key, display_name, qty, description)
+
+    def remove_items_in_room(self, map_name: str, room_id: str,
+                             key_or_name: str, qty: int = 1) -> bool:
+        map_obj = self.world.get(map_name)
+        if not map_obj:
+            return
+
+        room = map_obj.get_room(room_id)
+        if room:
+            return room.remove_item(key_or_name, qty)
+        return False
+
+    def list_items_in_room(self, map_name: str, room_id: str):
+        map_obj = self.world.get(map_name)
+        if not map_obj:
+            return ["(nothing)"]
+
+        room = map_obj.get_room(room_id)
+        if room:
+            return room.list_items()
+        return ["(nothing)"]
