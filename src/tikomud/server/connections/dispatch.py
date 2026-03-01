@@ -87,27 +87,39 @@ def handle_command(game, conn, player, msg: dict) -> None:
 
         if not item_name:
             send_json_to(conn, {
-                "type": "error",
+                "type": "take",
+                "ok": False,
                 "message": "Usage: take <item> [qty]"
             })
             return
 
+        ## Fetch current room
         map_name = player.position["map_name"]
         room_id = player.position["room"]
 
-        # Get current room object
-        room = game.world.get(map_name)
-        if not room:
+        if not map_name or not room_id:
             send_json_to(conn, {
-                "type": "error",
+                "type": "take",
+                "ok": False,
+                "message": "Player position is unknown."
+            })
+            return
+
+        # Get current room object
+        game_map = game.world.get(map_name)
+        if not game_map:
+            send_json_to(conn, {
+                "type": "take",
+                "ok": False,
                 "message": "Current map not found."
             })
             return
 
-        room_obj = room.get_room(room_id)
+        room_obj = game_map.get_room(room_id)
         if not room_obj:
             send_json_to(conn, {
-                "type": "error",
+                "type": "take",
+                "ok": False,
                 "message": "Current room not found."
             })
             return
@@ -122,8 +134,16 @@ def handle_command(game, conn, player, msg: dict) -> None:
             })
             return
 
-        # Get display_name and description before removing item
-        display_name, _, description = room_obj.items[key]
+        # Read item info via Room API (thread-safe)
+        info = room_obj.get_item_info(key)
+        if not info:
+            send_json_to(conn, {
+                "type": "take",
+                "ok": False,
+                "message": f"'{item_name}' is not in this room."
+            })
+            return
+        display_name, _available_qty, description = info
 
         # Attempt to remove the specified quantity from the room
         success = room_obj.remove_item(key, qty)
@@ -141,7 +161,6 @@ def handle_command(game, conn, player, msg: dict) -> None:
         # Notify all players in room about the pickup
         broadcast_chat_in_room(
             f"{player.name} picks up {display_name} x{qty}",
-            room_obj.players,
             sender=player
         )
 
