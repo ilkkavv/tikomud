@@ -48,6 +48,20 @@ def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
 
         return None, "Usage: inv or inventory"
 
+    if cmd == "talk":
+        if len(parts) < 2:
+            return None, "Usage: talk <npc>"
+
+        target = " ".join(parts[1:]).strip()
+        if not target:
+            return None, "Usage: talk <npc>"
+
+        return {
+            "type": "command",
+            "command": "talk",
+            "payload": {"target": target},
+        }, None
+
     if cmd in ("m", "move", "go"):
         payload = ""
         if len(parts) == 2:

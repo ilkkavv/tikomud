@@ -207,16 +207,47 @@ def handle_command(game, conn, player, msg: dict) -> None:
         map_name = player.position["map_name"]
         room_id = player.position["room"]
 
-        if hasattr(game, "list_room_items"):
-            items = game.list_room_items(map_name, room_id)
-        else:
-            items = ["(nothing)"]
+        items = game.list_room_items(map_name, room_id)
+        npcs = game.list_npcs_in_room(map_name, room_id)
 
         send_json_to(conn, {
             "type": "look",
             "message": f"You are in {map_name}/{room_id}",
             "room": {"map": map_name, "id": room_id},
             "floor": items,
+            "npcs": [npc.name for npc in npcs]
+        })
+        return
+
+    # Command talk
+    if command == "talk":
+        target = str(payload.get("target", "")).strip()
+
+        if not target:
+            send_json_to(conn, {
+                "type": "system",
+                "message": "Usage: talk <npc>"
+            })
+            return
+
+        map_name = player.position["map_name"]
+        room_id = player.position["room"]
+
+        npc = game.find_npc_in_room(map_name, room_id, target)
+
+        if not npc:
+            send_json_to(conn, {
+                "type": "system",
+                "message": f"There is no '{target}' here."
+            })
+            return
+
+        response = npc.talk()
+
+        send_json_to(conn, {
+            "type": "npc_talk",
+            "npc": npc.name,
+            "message": response
         })
         return
 

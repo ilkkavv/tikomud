@@ -1,0 +1,12 @@
+{
+    "id": "skeleton",
+    "name": "Skeleton",
+    "description": "Dusty skeleton, it is clutching something in its bony hand.",
+    "dialogue": [
+        "Talking without tongue seems to be hard."
+    ],
+    "spawn": {
+        "map_name": "overworld",
+        "room": "room1"
+    }
+}

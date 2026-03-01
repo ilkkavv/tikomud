@@ -1,15 +1,20 @@
 from tikomud.server.game.player import Player
 from tikomud.server.game.map import Map
+from tikomud.server.game.npc import NPC
+import json
+import os
 import threading
 
 class Game:
     def __init__(self):
         self.world = {"overworld": Map("rooms/overworld")}
         self.players = []
+        self.npcs = []
 
         self.room_items = {}
 
         self.game_lock = threading.Lock()
+        self.load_npcs()
 
     def add_player(self, new_player: Player) -> None:
         with self.game_lock:
@@ -99,3 +104,50 @@ class Game:
         if not d:
             return ["(nothing)"]
         return [f"{name} x{qty}" for _k, (name, qty, _desc) in sorted(d.items())]
+
+    # Helper function to find npcs
+    def find_npc_in_room(self, map_name: str, room_id: str, name: str):
+        name = name.strip().lower()
+
+        for npc in self.npcs:
+            if (
+                npc.position["map_name"] == map_name and
+                npc.position["room"] == room_id and
+                npc.name.lower() == name
+            ):
+                return npc
+
+        return None
+
+    # Function to list npcs inside current room
+    def list_npcs_in_room(self, map_name: str, room_id: str):
+        return [
+            npc for npc in self.npcs
+            if npc.position["map_name"] == map_name
+            and npc.position["room"] == room_id
+        ]
+
+    def load_npcs(self):
+        npc_folder = os.path.join(os.path.dirname(__file__), "npcs")
+
+        if not os.path.isdir(npc_folder):
+            return
+
+        for filename in os.listdir(npc_folder):
+            if not filename.endswith(".json"):
+                continue
+
+            with open(os.path.join(npc_folder, filename)) as f:
+                data = json.load(f)
+
+            npc = NPC(
+                data["id"],
+                data["name"],
+                data.get("description", ""),
+                data.get("dialogue", [])
+            )
+
+            spawn = data["spawn"]
+            npc.set_position(spawn["map_name"], spawn["room"])
+
+            self.npcs.append(npc)
