@@ -81,30 +81,99 @@ def handle_command(game, conn, player, msg: dict) -> None:
         )
         return
 
-    # Take item from current room (not fully implemented)
+    # Take item from current room
     if command == "take":
         qty, item_name = _parse_name_qty_from_payload(payload)
 
         if not item_name:
             send_json_to(conn, {
-                "type": "error",
+                "type": "take",
+                "ok": False,
                 "message": "Usage: take <item> [qty]"
             })
             return
 
-        if not hasattr(game, "remove_room_item"):
+        ## Fetch current room
+        map_name = player.position["map_name"]
+        room_id = player.position["room"]
+
+        if not map_name or not room_id:
             send_json_to(conn, {
-                "type": "error",
-                "message": "Room items not availabe yet on server."
+                "type": "take",
+                "ok": False,
+                "message": "Player position is unknown."
             })
             return
 
+        # Get current room object
+        game_map = game.world.get(map_name)
+        if not game_map:
+            send_json_to(conn, {
+                "type": "take",
+                "ok": False,
+                "message": "Current map not found."
+            })
+            return
+
+        room_obj = game_map.get_room(room_id)
+        if not room_obj:
+            send_json_to(conn, {
+                "type": "take",
+                "ok": False,
+                "message": "Current room not found."
+            })
+            return
+
+        # Resolve key in room items (support both key and display name)
+        key = room_obj._resolve_key(item_name)
+        if not key:
+            send_json_to(conn, {
+                "type": "take",
+                "ok": False,
+                "message": f"'{item_name}' is not in this room."
+            })
+            return
+
+        # Read item info via Room API (thread-safe)
+        info = room_obj.get_item_info(key)
+        if not info:
+            send_json_to(conn, {
+                "type": "take",
+                "ok": False,
+                "message": f"'{item_name}' is not in this room."
+            })
+            return
+        display_name, _available_qty, description = info
+
+        # Attempt to remove the specified quantity from the room
+        success = room_obj.remove_item(key, qty)
+        if not success:
+            send_json_to(conn, {
+                "type": "take",
+                "ok": False,
+                "message": f"Cannot take '{item_name}' x{qty} from the room."
+            })
+            return
+
+        # Add item to player's inventory
+        player.add_item(key, display_name, qty, description)
+
+        # Notify all players in room about the pickup
+        broadcast_chat_in_room(
+            f"{player.name} picks up {display_name} x{qty}",
+            sender=player
+        )
+
+        # Respond to the player
         send_json_to(conn, {
             "type": "take",
-            "ok": False,
-            "message": "Not implemented yet"
+            "ok": True,
+            "item": {
+                "key": key,
+                "name": display_name,
+                "quantity": qty,
+            }
         })
-        return
 
     # Examine item from inventory
     if command == "examine":
