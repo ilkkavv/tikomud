@@ -5,10 +5,13 @@ from tikomud.server.game.game import Game
 from tikomud.server.game.player import Player
 from tikomud.server.connections.dispatch import handle_command
 
+
 def handle_client(game: Game, conn, buff_size: int) -> None:
+    # Handle lifecycle of a single client connection
     username = ""
 
     try:
+        # First message is expected to be the username
         data = conn.recv(buff_size)
         if not data:
             return
@@ -17,10 +20,12 @@ def handle_client(game: Game, conn, buff_size: int) -> None:
         if not username:
             return
 
+        # Create and register new player
         new_player = Player(username)
         add_client(conn, new_player)
         game.add_player(new_player)
 
+        # Place player in starting location
         start_map_name = "overworld"
         start_room_id = "room1"
 
@@ -32,6 +37,7 @@ def handle_client(game: Game, conn, buff_size: int) -> None:
 
         print(f"{username} joined.")
 
+        # Notify all players about new connection
         broadcast_json(
             {
                 "type": "system",
@@ -39,6 +45,7 @@ def handle_client(game: Game, conn, buff_size: int) -> None:
             }
         )
 
+        # Buffer for assembling newline-delimited JSON messages
         buffer = ""
 
         while True:
@@ -49,6 +56,7 @@ def handle_client(game: Game, conn, buff_size: int) -> None:
 
             buffer += data.decode("utf-8", errors="replace")
 
+            # Process complete JSON messages separated by newline
             while "\n" in buffer:
                 line, buffer = buffer.split("\n", 1)
                 line = line.rstrip("\r").strip()
@@ -58,32 +66,51 @@ def handle_client(game: Game, conn, buff_size: int) -> None:
                 try:
                     msg = json.loads(line)
                 except json.JSONDecodeError:
+                    # Return structured error for invalid JSON input
                     try:
                         conn.sendall(
-                            (json.dumps({"type": "error", "code": "INVALID_JSON", "message": "Invalid JSON"}) + "\n").encode("utf-8")
+                            (
+                                json.dumps({
+                                    "type": "error",
+                                    "code": "INVALID_JSON",
+                                    "message": "Invalid JSON"
+                                }) + "\n"
+                            ).encode("utf-8")
                         )
                     except OSError:
                         pass
                     continue
 
+                # Delegate command handling to dispatcher
                 handle_command(game=game, conn=conn, player=new_player, msg=msg)
 
     except ConnectionResetError:
+        # Handle abrupt client disconnect
         print(f"Connection reset by {username or 'unknown'}.")
     finally:
+        # Cleanup on disconnect or error
         leaving = remove_client(conn)
 
         if leaving:
             if leaving in game.players:
                 game.remove_player(leaving)
+
+                # Distinguish between voluntary leave and kick
                 if leaving.name in kicked:
                     kicked.remove(leaving.name)
                     print(f"{leaving.name} was kicked.")
-                    broadcast_json({"type": "system", "message": f"{leaving.name} was kicked by the server!"})
+                    broadcast_json({
+                        "type": "system",
+                        "message": f"{leaving.name} was kicked by the server!"
+                    })
                 else:
                     print(f"{leaving.name} left.")
-                    broadcast_json({"type": "system", "message": f"{leaving.name} has left!"})
+                    broadcast_json({
+                        "type": "system",
+                        "message": f"{leaving.name} has left!"
+                    })
 
+        # Ensure socket is properly closed
         try:
             conn.close()
         except OSError:
