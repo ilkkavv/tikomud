@@ -14,9 +14,9 @@ This project is currently under active development. The game is not feature-comp
 
 - Basic client-server architecture
 - Player name input on launch
-- Feature NPCs
 - Send messages to other players
 - Move between different rooms
+- Interactive NPC system
 
 ---
 
