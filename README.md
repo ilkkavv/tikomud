@@ -28,7 +28,6 @@ The following major systems are still missing:
 - Persistent world (data saving)
 - Character stats and progression
 - Items and equipment system
-- NPCs
 - Monsters and combat system
 - Dialogue system
 
