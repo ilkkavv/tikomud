@@ -87,3 +87,7 @@ class Room:
             if len(matches) == 1:
                 return matches[0]
         return None
+
+    def get_item_info(self, key: str):
+        with self.items_lock:
+            return self.items.get(key)
