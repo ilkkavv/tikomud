@@ -15,7 +15,9 @@ This project is currently under active development. The game is not feature-comp
 - Basic client-server architecture
 - Player name input on launch
 - `yell` command (broadcast message to all connected players)
+- `say` command (broadcast message to players in same room)
 - `inv` command (displays player inventory - currently empty)
+- `move`, `m`, `go` <direction> command (moves player to given direction)
 
 ---
 
@@ -25,7 +27,6 @@ The following major systems are still missing:
 
 - Authentication / proper login system
 - Persistent world (data saving)
-- Player movement between rooms
 - Character stats and progression
 - Items and equipment system
 - NPCs
