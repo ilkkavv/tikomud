@@ -2,9 +2,9 @@ class Item:
 
     # Basic representation of an item in the game world.
     def __init__(self, key: str, name: str, qty: int = 1, desc: str = ""):
-        self.key = key
+        self.key = (key or "").strip().lower()
         self.name = name
-        self.qty = qty
+        self.qty = max(1, int(qty))
         self.desc = desc
 
     # Methods to Item class
