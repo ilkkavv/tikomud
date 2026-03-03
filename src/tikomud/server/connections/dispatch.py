@@ -288,24 +288,24 @@ def handle_command(game, conn, player, msg: dict) -> None:
         })
         return
 
-# Command talk
-if command == "talk":
-    target = str(payload.get("target", "")).strip()
+    # Command talk
+    if command == "talk":
+        target = str(payload.get("target", "")).strip()
 
-    # Case 1: Player is already in dialogue and selecting option
-    if player.active_npc and target.isdigit():
-        choice_index = int(target) - 1
+        # Case 1: Player is already in dialogue and selecting option
+        if player.active_npc and target.isdigit():
+            choice_index = int(target) - 1
 
-        npc = player.active_npc
-        node = npc.dialogue.get(player.dialogue_node, {})
-        options = node.get("options", [])
+            npc = player.active_npc
+            node = npc.dialogue.get(player.dialogue_node, {})
+            options = node.get("options", [])
 
-        if choice_index < 0 or choice_index >= len(options):
-            send_json_to(conn, {
-                "type": "system",
-                "message": "Invalid choice."
-            })
-            return
+            if choice_index < 0 or choice_index >= len(options):
+                send_json_to(conn, {
+                    "type": "system",
+                    "message": "Invalid choice."
+                })
+                return
 
         next_id = options[choice_index]["next"]
 
