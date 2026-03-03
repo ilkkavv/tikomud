@@ -88,6 +88,14 @@ def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
 
         return None, "Usage: move [direction]"
 
+    # NEW: look
+    if cmd == "look":
+        return {
+            "type": "command",
+            "command": "look",
+            "payload": {}
+        }, None
+
     return None, f"Unknown command: {cmd}"
 
 def send_validated(connection, user_input: str) -> Optional[str]:
