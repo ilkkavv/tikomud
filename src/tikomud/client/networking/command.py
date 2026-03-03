@@ -88,6 +88,74 @@ def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
 
         return None, "Usage: move [direction]"
 
+    # NEW: look
+    if cmd == "look":
+        return {
+            "type": "command",
+            "command": "look",
+            "payload": {}
+        }, None
+
+    # NEW: take
+    if cmd == "take":
+        if len(parts) < 2:
+            return None, "Usage: take <item> [qty]"
+
+        item = parts[1]
+        qty = 1
+
+        if len(parts) >= 3:
+            try:
+                qty = int(parts[2])
+            except ValueError:
+                return None, "Quantity must be a number."
+
+            return {
+                "type": "command",
+                "command": "take",
+                "payload": {"item": item, "qty": qty}
+            }, None
+
+    # NEW: drop
+    if cmd == "drop":
+        if len(parts) < 2:
+            return None, "Usage: drop <item> [qty]"
+
+        item = parts[1]
+        qty = 1
+
+        if len(parts) >= 3:
+            try:
+                qty = int(parts[2])
+            except ValueError:
+                return None, "Quantity mus be a number"
+
+        return {
+            "type": "command",
+            "command": "drop",
+            "payload": {"item": item, "qty": qty}
+        }, None
+
+    # NEW: examine
+    if cmd == "examine":
+        if len(parts) < 2:
+            return None, "Usage: examine <item>"
+
+        item = " ".join(parts[1:]).strip()
+        return {
+            "type": "command",
+            "command": "examine",
+            "payload": {"item": item}
+        }, None
+
+    # NEW: help
+    if cmd == "help":
+        return {
+            "type": "command",
+            "command": "help",
+            "payload": {}
+        }, None
+
     return None, f"Unknown command: {cmd}"
 
 def send_validated(connection, user_input: str) -> Optional[str]:
