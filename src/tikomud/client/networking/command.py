@@ -116,6 +116,26 @@ def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
                 "payload": {"item": item, "qty": qty}
             }, None
 
+    # NEW: drop
+    if cmd == "drop":
+        if len(parts) < 2:
+            return None, "Usage: drop <item> [qty]"
+
+        item = parts[1]
+        qty = 1
+
+        if len(parts) >= 3:
+            try:
+                qty = int(parts[2])
+            except ValueError:
+                return None, "Quantity mus be a number"
+
+        return {
+            "type": "command",
+            "command": "drop",
+            "payload": {"item": item, "qty": qty}
+        }, None
+
     return None, f"Unknown command: {cmd}"
 
 def send_validated(connection, user_input: str) -> Optional[str]:
