@@ -67,7 +67,7 @@ def draw(stdscr, messages, current_input: str) -> None:
 
     stdscr.refresh()
 
-def _main(stdscr, send_fn, incoming_queue, stop_event) -> None:
+def _main(stdscr, send_fn, incoming_queue, stop_event, in_dialogue_flag) -> None:
     curses.curs_set(1)
     stdscr.keypad(True)
     stdscr.timeout(50)
@@ -82,6 +82,10 @@ def _main(stdscr, send_fn, incoming_queue, stop_event) -> None:
                 line = render_incoming(incoming)
                 if line:
                     print_msg(messages, line)
+
+                # Check for dialogue end signal
+                if isinstance(incoming, dict) and incoming.get("conversation_ended"):
+                    in_dialogue_flag()[0] = False  # use a mutable container
         except queue.Empty:
             pass
 
@@ -117,5 +121,5 @@ def _main(stdscr, send_fn, incoming_queue, stop_event) -> None:
         if 32 <= key <= 126:
             current_input += chr(key)
 
-def run(send_fn, incoming_queue, stop_event) -> None:
-    curses.wrapper(lambda stdscr: _main(stdscr, send_fn, incoming_queue, stop_event))
+def run(send_fn, incoming_queue, stop_event, in_dialogue_flag) -> None:
+    curses.wrapper(lambda stdscr: _main(stdscr, send_fn, incoming_queue, stop_event, in_dialogue_flag))
