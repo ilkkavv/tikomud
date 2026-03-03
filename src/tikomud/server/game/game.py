@@ -138,6 +138,23 @@ class Game:
             return room.list_items()
         return ["(nothing)"]
 
+    def _build_dialogue_text(self, node: dict) -> str:
+        text = node.get("text", "")
+        options = node.get("options", [])
+
+        if not options:
+            return text
+
+        lines = [text, ""]
+
+        for i, option in enumerate(options):
+            lines.append(f"{i+1}. {option['text']}")
+
+        lines.append("")
+        lines.append("Choose a number.")
+
+        return "\n".join(lines)
+
     def start_dialogue(self, player: Player, npc: NPC):
         if not npc.dialogue:
             return False, f"{npc.name} has nothing to say."
