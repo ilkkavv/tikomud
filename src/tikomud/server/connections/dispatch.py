@@ -288,37 +288,86 @@ def handle_command(game, conn, player, msg: dict) -> None:
         })
         return
 
-    # Command talk
-    if command == "talk":
-        target = str(payload.get("target", "")).strip()
+# Command talk
+if command == "talk":
+    target = str(payload.get("target", "")).strip()
 
-        if not target:
+    # Case 1: Player is already in dialogue and selecting option
+    if player.active_npc and target.isdigit():
+        choice_index = int(target) - 1
+
+        npc = player.active_npc
+        node = npc.dialogue.get(player.dialogue_node, {})
+        options = node.get("options", [])
+
+        if choice_index < 0 or choice_index >= len(options):
             send_json_to(conn, {
                 "type": "system",
-                "message": "Usage: talk <npc>"
+                "message": "Invalid choice."
             })
             return
 
-        map_name = player.position["map_name"]
-        room_id = player.position["room"]
+        next_id = options[choice_index]["next"]
 
-        npc = game.find_npc_in_room(map_name, room_id, target)
-
-        if not npc:
+        if next_id is None:
+            player.active_npc = None
+            player.dialogue_node = None
             send_json_to(conn, {
                 "type": "system",
-                "message": f"There is no '{target}' here."
+                "message": "Conversation ended."
             })
             return
 
-        response = npc.talk()
+        player.dialogue_node = next_id
+        next_node = npc.dialogue[next_id]
 
         send_json_to(conn, {
             "type": "npc_talk",
             "npc": npc.name,
-            "message": response
+            "message": build_dialogue_text(next_node)
         })
         return
+
+
+    # Case 2: Start new dialogue
+    if not target:
+        send_json_to(conn, {
+            "type": "system",
+            "message": "Usage: talk <npc>"
+        })
+        return
+
+    map_name = player.position["map_name"]
+    room_id = player.position["room"]
+
+    npc = game.find_npc_in_room(map_name, room_id, target)
+
+    if not npc:
+        send_json_to(conn, {
+            "type": "system",
+            "message": f"There is no '{target}' here."
+        })
+        return
+
+    if not npc.dialogue:
+        send_json_to(conn, {
+            "type": "system",
+            "message": f"{npc.name} has nothing to say."
+        })
+        return
+
+    # Initialize dialogue
+    player.active_npc = npc
+    player.dialogue_node = "start"
+
+    start_node = npc.dialogue["start"]
+
+    send_json_to(conn, {
+        "type": "npc_talk",
+        "npc": npc.name,
+        "message": build_dialogue_text(start_node)
+    })
+    return
 
     if command == "help":
         # Return list of available commands
