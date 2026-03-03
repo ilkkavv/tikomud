@@ -11,7 +11,7 @@ class NPC:
         self.id = npc_id
         self.name = name
         self.description = description
-        self.dialogue = dialogue
+        self.dialogue = data.get("dialogue", {})
 
         # same structure as player
         self.position = {}
