@@ -36,24 +36,30 @@ The following major systems are still missing:
 ## Installation & Running
 
 ### Requirements
+
 - Python 3.10+
 - Linux / WSL (curses is required)
 
 ### Clone the repository
+
 ```bash
 git clone https://github.com/ilkkavv/tikomud
 cd tikomud
 ```
 
 ### Running the server
+
 Open a terminal:
+
 ```bash
 cd tikomud/src
 python3 -m tikomud.server
 ```
 
 ### Running the client (TUI)
+
 Open another terminal:
+
 ```bash
 cd tikomud/src
 python3 -m tikomud.client
@@ -69,6 +75,11 @@ python3 -m tikomud.client
   - `say` – broadcast message to players in the same room
   - `inv` – display player inventory (currently empty)
   - `move | m | go <direction>` – move to the given direction
+  - `look` - inspect the current room, floor items, and NPCs
+  - `take <item> [qty]` - pick up an item from the room
+  - `drop <item> [qty]` - drop an item into the room
+  - `examine <item>` - view a detailed description of an item in your inventory
   - `talk <npc>` – talk to an NPC
+  - `help` - show a list of supported commands
 
 More gameplay systems will be introduced in future releases.
