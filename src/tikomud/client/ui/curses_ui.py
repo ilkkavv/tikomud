@@ -43,19 +43,20 @@ def print_msg(messages, msg) -> None:
     if not isinstance(msg, str):
         msg = str(msg)
 
-    for raw_line in msg.splitlines() or [""]:
-        wrapped = textwrap.wrap(raw_line, width=120)  # tai anna width draw()sta
-        if not wrapped:
-            messages.append("")
-        else:
-            messages.extend(wrapped)
+    messages.extend(msg.splitlines() or [""])
 
 def draw(stdscr, messages, current_input: str) -> None:
     stdscr.clear()
     height, width = stdscr.getmaxyx()
 
     max_lines = height - 2
-    visible = messages[-max_lines:]
+    wrapped_lines = []
+
+    for line in messages:
+        wrapped = textwrap.wrap(line, width=width - 1) or [""]
+        wrapped_lines.extend(wrapped)
+
+    visible = wrapped_lines[-max_lines:]
 
     for i, line in enumerate(visible):
         stdscr.addnstr(i, 0, line, width - 1)
