@@ -1,7 +1,6 @@
 from tikomud.server.connections.clients import broadcast_chat, broadcast_chat_in_room
 from tikomud.server.connections.clients import send_json_to
 
-
 def _parse_name_qty_from_payload(payload: dict) -> tuple[int, str]:
     # Extract item name and quantity safely from command payload
     item_name = str(payload.get("item", "")).strip()
@@ -16,6 +15,25 @@ def _parse_name_qty_from_payload(payload: dict) -> tuple[int, str]:
     qty = max(1, qty)
     return qty, item_name
 
+def build_dialogue_text(node: dict) -> str:
+    if not node:
+        return ""
+
+    text = node.get("text", "")
+    options = node.get("options", [])
+
+    if not options:
+        return text
+
+    lines = [text, ""]
+
+    for i, option in enumerate(options):
+        lines.append(f"{i+1}. {option.get('text','')}")
+
+    lines.append("")
+    lines.append("Choose a number.")
+
+    return "\n".join(lines)
 
 def handle_command(game, conn, player, msg: dict) -> None:
     # Main dispatcher for handling player commands
@@ -292,7 +310,6 @@ def handle_command(game, conn, player, msg: dict) -> None:
     if command == "talk":
         target = str(payload.get("target", "")).strip()
 
-        # Case 1: Player is already in dialogue and selecting option
         if player.active_npc and target.isdigit():
             choice_index = int(target) - 1
 
@@ -307,26 +324,27 @@ def handle_command(game, conn, player, msg: dict) -> None:
                 })
                 return
 
-        next_id = options[choice_index]["next"]
+            # Move this line here
+            next_id = options[choice_index]["next"]
 
-        if next_id is None:
-            player.active_npc = None
-            player.dialogue_node = None
+            if next_id is None:
+                player.active_npc = None
+                player.dialogue_node = None
+                send_json_to(conn, {
+                    "type": "system",
+                    "message": "Conversation ended."
+                })
+                return
+
+            player.dialogue_node = next_id
+            next_node = npc.dialogue[next_id]
+
             send_json_to(conn, {
-                "type": "system",
-                "message": "Conversation ended."
+                "type": "npc_talk",
+                "npc": npc.name,
+                "message": build_dialogue_text(next_node)
             })
             return
-
-        player.dialogue_node = next_id
-        next_node = npc.dialogue[next_id]
-
-        send_json_to(conn, {
-            "type": "npc_talk",
-            "npc": npc.name,
-            "message": build_dialogue_text(next_node)
-        })
-        return
 
 
     # Case 2: Start new dialogue
