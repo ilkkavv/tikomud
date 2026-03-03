@@ -43,12 +43,7 @@ def print_msg(messages, msg) -> None:
     if not isinstance(msg, str):
         msg = str(msg)
 
-    for raw_line in msg.splitlines() or [""]:
-        wrapped = textwrap.wrap(raw_line, width=120)  # tai anna width draw()sta
-        if not wrapped:
-            messages.append("")
-        else:
-            messages.extend(wrapped)
+    messages.extend(msg.splitlines() or [""])
 
 def draw(stdscr, messages, current_input: str) -> None:
     stdscr.clear()
