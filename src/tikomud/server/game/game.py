@@ -137,3 +137,16 @@ class Game:
         if room:
             return room.list_items()
         return ["(nothing)"]
+
+    def start_dialogue(self, player: Player, npc: NPC):
+        if not npc.dialogue:
+            return False, f"{npc.name} has nothing to say."
+
+        player.active_npc = npc
+        player.dialogue_node = "start"
+
+        node = npc.dialogue.get("start")
+        if not node:
+            return False, "Dialogue error: missing start node."
+
+        return True, self._build_dialogue_text(node)
