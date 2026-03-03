@@ -2,6 +2,8 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.position = {}
+        self.active_dialogue = None  # NPC id
+        self.dialogue_node = None    # current node id
 
         # Player inventory structure
         self.inventory = {}
