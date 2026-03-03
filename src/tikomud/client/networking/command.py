@@ -3,7 +3,14 @@ from typing import Optional, Dict, Any, Tuple
 
 Packet = Dict[str, Any]
 
-def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
+def validate(user_input: str, in_dialogue: bool = False) -> Tuple[Optional[Packet], Optional[str]]:
+    if in_dialogue and user_input.isdigit():
+        # Number input for current dialogue
+        return {
+            "type": "command",
+            "command": "talk",
+            "payload": {"target": user_input}
+        }, None
     parts = user_input.strip().split()
     if not parts:
         return None, None
@@ -158,8 +165,9 @@ def validate(user_input: str) -> Tuple[Optional[Packet], Optional[str]]:
 
     return None, f"Unknown command: {cmd}"
 
-def send_validated(connection, user_input: str) -> Optional[str]:
-    packet, local_msg = validate(user_input)
+# command.py
+def send_validated(connection, user_input: str, in_dialogue: bool = False) -> Optional[str]:
+    packet, local_msg = validate(user_input, in_dialogue=in_dialogue)
 
     if local_msg is not None:
         return local_msg
