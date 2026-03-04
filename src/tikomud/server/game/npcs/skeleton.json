@@ -2,11 +2,57 @@
     "id": "skeleton",
     "name": "Skeleton",
     "description": "Dusty skeleton, it is clutching something in its bony hand.",
-    "dialogue": [
-        "Talking without tongue seems to be hard."
-    ],
     "spawn": {
         "map_name": "overworld",
         "room": "room1"
+    },
+    "dialogue": {
+        "start": {
+            "text": "The skeleton's jaw rattles. What do you want?",
+            "options": [
+                {
+                    "text": "What are you holding?",
+                    "next": "holding"
+                },
+                {
+                    "text": "Who are you?",
+                    "next": "identity"
+                },
+                {
+                    "text": "Goodbye.",
+                    "next": null
+                }
+            ]
+        },
+        "holding": {
+            "text": "It raises a rusted key between its fingers.",
+            "options": [
+                {
+                    "text": "Can I have it?",
+                    "next": "give_key"
+                },
+                {
+                    "text": "Never mind.",
+                    "next": "start"
+                }
+            ]
+        },
+        "identity": {
+            "text": "I was once a guardian... now only bones remain.",
+            "options": [
+                {
+                    "text": "What were you guarding?",
+                    "next": "holding"
+                },
+                {
+                    "text": "That sounds tragic.",
+                    "next": "start"
+                }
+            ]
+        },
+        "give_key": {
+            "text": "The skeleton drops the key at your feet.",
+            "options": []
+        }
     }
 }

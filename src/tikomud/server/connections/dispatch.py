@@ -1,7 +1,6 @@
 from tikomud.server.connections.clients import broadcast_chat, broadcast_chat_in_room
 from tikomud.server.connections.clients import send_json_to
 
-
 def _parse_name_qty_from_payload(payload: dict) -> tuple[int, str]:
     # Extract item name and quantity safely from command payload
     item_name = str(payload.get("item", "")).strip()
@@ -16,6 +15,25 @@ def _parse_name_qty_from_payload(payload: dict) -> tuple[int, str]:
     qty = max(1, qty)
     return qty, item_name
 
+def build_dialogue_text(node: dict) -> str:
+    if not node:
+        return ""
+
+    text = node.get("text", "")
+    options = node.get("options", [])
+
+    if not options:
+        return text
+
+    lines = [text, ""]
+
+    for i, option in enumerate(options):
+        lines.append(f"{i+1}. {option.get('text','')}")
+
+    lines.append("")
+    lines.append("Choose a number.")
+
+    return "\n".join(lines)
 
 def handle_command(game, conn, player, msg: dict) -> None:
     # Main dispatcher for handling player commands
@@ -292,33 +310,82 @@ def handle_command(game, conn, player, msg: dict) -> None:
     if command == "talk":
         target = str(payload.get("target", "")).strip()
 
-        if not target:
+        if player.active_npc and target.isdigit():
+            choice_index = int(target) - 1
+
+            npc = player.active_npc
+            node = npc.dialogue.get(player.dialogue_node, {})
+            options = node.get("options", [])
+
+            if choice_index < 0 or choice_index >= len(options):
+                send_json_to(conn, {
+                    "type": "system",
+                    "message": "Invalid choice."
+                })
+                return
+
+            # Move this line here
+            next_id = options[choice_index]["next"]
+
+            if next_id is None:
+                player.active_npc = None
+                player.dialogue_node = None
+                send_json_to(conn, {
+                    "type": "system",
+                    "message": "Conversation ended."
+                })
+                return
+
+            player.dialogue_node = next_id
+            next_node = npc.dialogue[next_id]
+
             send_json_to(conn, {
-                "type": "system",
-                "message": "Usage: talk <npc>"
+                "type": "npc_talk",
+                "npc": npc.name,
+                "message": build_dialogue_text(next_node)
             })
             return
 
-        map_name = player.position["map_name"]
-        room_id = player.position["room"]
 
-        npc = game.find_npc_in_room(map_name, room_id, target)
-
-        if not npc:
-            send_json_to(conn, {
-                "type": "system",
-                "message": f"There is no '{target}' here."
-            })
-            return
-
-        response = npc.talk()
-
+    # Case 2: Start new dialogue
+    if not target:
         send_json_to(conn, {
-            "type": "npc_talk",
-            "npc": npc.name,
-            "message": response
+            "type": "system",
+            "message": "Usage: talk <npc>"
         })
         return
+
+    map_name = player.position["map_name"]
+    room_id = player.position["room"]
+
+    npc = game.find_npc_in_room(map_name, room_id, target)
+
+    if not npc:
+        send_json_to(conn, {
+            "type": "system",
+            "message": f"There is no '{target}' here."
+        })
+        return
+
+    if not npc.dialogue:
+        send_json_to(conn, {
+            "type": "system",
+            "message": f"{npc.name} has nothing to say."
+        })
+        return
+
+    # Initialize dialogue
+    player.active_npc = npc
+    player.dialogue_node = "start"
+
+    start_node = npc.dialogue["start"]
+
+    send_json_to(conn, {
+        "type": "npc_talk",
+        "npc": npc.name,
+        "message": build_dialogue_text(start_node)
+    })
+    return
 
     if command == "help":
         # Return list of available commands

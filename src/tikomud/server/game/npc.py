@@ -7,11 +7,11 @@
 #   - etc
 
 class NPC:
-    def __init__(self, npc_id: str, name: str, description: str, dialogue: list[str]):
+    def __init__(self, npc_id: str, name: str, description: str, dialogue: dict):
         self.id = npc_id
         self.name = name
         self.description = description
-        self.dialogue = dialogue
+        self.dialogue = dialogue or {}
 
         # same structure as player
         self.position = {}

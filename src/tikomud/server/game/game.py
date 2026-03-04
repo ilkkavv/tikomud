@@ -137,3 +137,44 @@ class Game:
         if room:
             return room.list_items()
         return ["(nothing)"]
+
+    def start_dialogue(self, player: Player, npc: NPC):
+        if not npc.dialogue:
+            return False, f"{npc.name} has nothing to say."
+
+        player.active_npc = npc
+        player.dialogue_node = "start"
+
+        node = npc.dialogue.get("start")
+        if not node:
+            return False, "Dialogue error: missing start node."
+
+        return True, self._build_dialogue_text(node)
+
+    def advance_dialogue(self, player: Player, choice_index: int):
+        npc = player.active_npc
+        if not npc:
+            return False, "You are not in a conversation."
+
+        node = npc.dialogue.get(player.dialogue_node, {})
+        options = node.get("options", [])
+
+        if choice_index < 0 or choice_index >= len(options):
+            return False, "Invalid choice."
+
+        next_id = options[choice_index]["next"]
+
+        if next_id is None:
+            player.active_npc = None
+            player.dialogue_node = None
+            return True, "Conversation ended."
+
+        player.dialogue_node = next_id
+        next_node = npc.dialogue.get(next_id)
+
+        if not next_node:
+            player.active_npc = None
+            player.dialogue_node = None
+            return False, "Dialogue error: missing node."
+
+        return True, self._build_dialogue_text(next_node)
