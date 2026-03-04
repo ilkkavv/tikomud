@@ -16,7 +16,7 @@ This project is currently under active development. The game is not feature-comp
 - Player name input on launch
 - Send messages to other players
 - Move between different rooms
-- Interactive NPC system
+- Interactive NPC system with dialogue system
 
 ---
 
@@ -29,8 +29,6 @@ The following major systems are still missing:
 - Character stats and progression
 - Items and equipment system
 - Monsters and combat system
-- Dialogue system
-
 ---
 
 ## Installation & Running
@@ -79,7 +77,7 @@ python3 -m tikomud.client
   - `take <item> [qty]` - pick up an item from the room
   - `drop <item> [qty]` - drop an item into the room
   - `examine <item>` - view a detailed description of an item in your inventory
-  - `talk <npc>` – talk to an NPC
+  - `talk <npc>` – have a dialogue with an NPC, choose dialogue options with numbers
   - `help` - show a list of supported commands
 
 More gameplay systems will be introduced in future releases.
