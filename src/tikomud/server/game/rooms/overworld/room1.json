@@ -1,6 +1,6 @@
 {
   "name": "Room One",
-  "description": "A small stone chamber with cold walls.",
+  "description": "A small stone chamber with cold walls that are are covered in faces.\nNot carved.\nNot sculpted.\nPressed into the stone as if the rock itself tried to remember them.",
   "items": [],
   "exits": {
     "west": {
